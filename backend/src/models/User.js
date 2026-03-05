@@ -1,13 +1,12 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-    full_name: {
+    googleId: { type: String, default: null },
+    avatar: { type: String, default: 'default.jpg' },
+    authType: { type: String, enum: ['local', 'google'], default: 'local' },
+    name: {
         type: String,
         required: true
-    },
-    avatar_url: {
-        type: String,
-        default: ''
     },
     email: {
         type: String,
@@ -17,6 +16,15 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    refreshToken: {
+        type: String,
+        default: null
     }
 }, {
     timestamps: true
