@@ -6,7 +6,14 @@ const userSchema = new mongoose.Schema({
     authType: { type: String, enum: ['local', 'google'], default: 'local' },
     name: {
         type: String,
-        required: true
+    },
+    phone: {
+        type: String,
+        default: ''
+    },
+    address: {
+        type: String,
+        default: ''
     },
     email: {
         type: String,

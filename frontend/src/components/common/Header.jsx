@@ -44,7 +44,7 @@ const Header = () => {
                                 <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
                                     {user.avatar ? <img src={user.avatar} alt="avatar" /> : <User className="h-5 w-5 text-gray-600" />}
                                 </div>
-                                <span className="hidden lg:inline text-sm font-medium">{user.full_name}</span>
+                                <span className="hidden lg:inline text-sm font-medium">{user.name}</span>
                             </Link>
                             <Button
                                 variant="ghost"

@@ -5,15 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { Chrome, Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import { useApp } from "@/contexts/AppContext";
+import { handleGoogleLogin } from "@/components/GoogleLogin";
 
 const Login = () => {
     const navigate = useNavigate();
-    const { login } = useApp();
+    const { login, googleLogin } = useApp();
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [formData, setFormData] = useState({ email: "", password: "" });
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,9 +23,13 @@ const Login = () => {
         setLoading(true);
         const success = await login(formData);
         setLoading(false);
-        if (success) {
-            navigate("/");
-        }
+        if (success) navigate("/");
+    };
+
+    const onGoogleClick = async () => {
+        setGoogleLoading(true);
+        await handleGoogleLogin(googleLogin, navigate);
+        setGoogleLoading(false);
     };
 
     return (
@@ -34,8 +37,14 @@ const Login = () => {
             <div className="w-full max-w-[480px]">
                 <Card className="border-none shadow-sm rounded-2xl">
                     <CardContent className="p-10 space-y-8">
-                        <Button variant="outline" className="w-full h-12 gap-3 font-semibold bg-gray-50 border-gray-300 hover:bg-gray-100 transition-colors rounded-xl">
-                            <Chrome className="h-5 w-5" /> Tiếp tục với Google
+                        <Button
+                            onClick={onGoogleClick}
+                            disabled={googleLoading}
+                            variant="outline"
+                            className="w-full h-12 gap-3 font-semibold bg-gray-50 border-gray-300 hover:bg-gray-100 transition-colors rounded-xl"
+                        >
+                            <Chrome className="h-5 w-5" />
+                            {googleLoading ? "Đang xử lý..." : "Tiếp tục với Google"}
                         </Button>
 
                         <div className="relative">
@@ -65,9 +74,7 @@ const Login = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm font-bold text-secondary">Mật khẩu</label>
-                                    </div>
+                                    <label className="text-sm font-bold text-secondary">Mật khẩu</label>
                                     <div className="relative">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                         <Input

@@ -4,11 +4,17 @@ import { successResponse, errorResponse } from "../utils/response.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-const generateToken = async (userId) => {
-    const uid = userId.toString();
-    // Firebase tokens for communication or custom needs
-    const accessToken = await admin.auth().createCustomToken(uid);
-    const refreshToken = await admin.auth().createCustomToken(uid);
+const generateToken = (userId) => {
+    const accessToken = jwt.sign(
+        { id: userId },
+        process.env.JWT_ACCESS_SECRET || 'access_secret',
+        { expiresIn: process.env.JWT_ACCESS_EXPIRE || '1h' }
+    );
+    const refreshToken = jwt.sign(
+        { id: userId },
+        process.env.JWT_REFRESH_SECRET || 'refresh_secret',
+        { expiresIn: process.env.JWT_REFRESH_EXPIRE || '30d' }
+    );
     return { accessToken, refreshToken };
 };
 
@@ -24,22 +30,6 @@ const cookieOptions = {
  *   post:
  *     summary: Login with Google Firebase token
  *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - token
- *             properties:
- *               token:
- *                 type: string
- *     responses:
- *       200:
- *         description: Success
- *       401:
- *         description: Unauthorized
  */
 export const googleLoginController = async (req, res) => {
     try {
@@ -84,7 +74,8 @@ export const googleLoginController = async (req, res) => {
             });
         }
 
-        const tokens = await generateToken(user._id);
+        // Generate standard JWT tokens
+        const tokens = generateToken(user._id);
 
         await User.findByIdAndUpdate(user._id, {
             refreshToken: tokens.refreshToken,
@@ -135,31 +126,35 @@ export const googleLoginController = async (req, res) => {
  *     tags: [Auth]
  */
 export const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-        const tokens = await generateToken(user._id);
+        if (user && (await bcrypt.compare(password, user.password))) {
+            const tokens = generateToken(user._id);
 
-        await User.findByIdAndUpdate(user._id, {
-            refreshToken: tokens.refreshToken,
-        });
+            await User.findByIdAndUpdate(user._id, {
+                refreshToken: tokens.refreshToken,
+            });
 
-        res.cookie("refreshToken", tokens.refreshToken, cookieOptions);
+            res.cookie("refreshToken", tokens.refreshToken, cookieOptions);
 
-        return successResponse(res, "Đăng nhập thành công", {
-            accessToken: tokens.accessToken,
-            user: {
-                _id: user._id,
-                email: user.email,
-                name: user.name,
-                avatar: user.avatar,
-                role: user.role,
-            },
-        });
-    } else {
-        return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
+            return successResponse(res, "Đăng nhập thành công", {
+                accessToken: tokens.accessToken,
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    avatar: user.avatar,
+                    role: user.role,
+                },
+            });
+        } else {
+            return errorResponse(res, 'Email hoặc mật khẩu không đúng', 401);
+        }
+    } catch (error) {
+        return errorResponse(res, error.message, 500);
     }
 };
 
@@ -171,43 +166,47 @@ export const loginUser = async (req, res) => {
  *     tags: [Auth]
  */
 export const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    try {
+        const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email });
 
-    if (userExists) {
-        return errorResponse(res, 'Email đã được sử dụng', 400);
-    }
+        if (userExists) {
+            return errorResponse(res, 'Email đã được sử dụng', 400);
+        }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
-    });
-
-    if (user) {
-        const tokens = await generateToken(user._id);
-
-        await User.findByIdAndUpdate(user._id, {
-            refreshToken: tokens.refreshToken,
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
         });
 
-        res.cookie("refreshToken", tokens.refreshToken, cookieOptions);
+        if (user) {
+            const tokens = generateToken(user._id);
 
-        return successResponse(res, "Đăng ký thành công", {
-            accessToken: tokens.accessToken,
-            user: {
-                _id: user._id,
-                email: user.email,
-                name: user.name,
-                avatar: user.avatar,
-                role: user.role,
-            },
-        }, 201);
-    } else {
-        return errorResponse(res, 'Dữ liệu không hợp lệ', 400);
+            await User.findByIdAndUpdate(user._id, {
+                refreshToken: tokens.refreshToken,
+            });
+
+            res.cookie("refreshToken", tokens.refreshToken, cookieOptions);
+
+            return successResponse(res, "Đăng ký thành công", {
+                accessToken: tokens.accessToken,
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    avatar: user.avatar,
+                    role: user.role,
+                },
+            }, 201);
+        } else {
+            return errorResponse(res, 'Dữ liệu không hợp lệ', 400);
+        }
+    } catch (error) {
+        return errorResponse(res, error.message, 500);
     }
 };

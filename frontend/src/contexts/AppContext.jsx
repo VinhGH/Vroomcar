@@ -5,7 +5,10 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
     const [cars, setCars] = useState([]);
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('userInfo')) || null);
+    const [user, setUser] = useState(() => {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        return userInfo ? userInfo.user : null;
+    });
     const [bookings, setBookings] = useState([]);
     const [selectedCar, setSelectedCar] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -53,8 +56,9 @@ export const AppProvider = ({ children }) => {
     // Auth functions
     const login = async (formData) => {
         try {
-            const { data } = await authAPI.login(formData);
-            setUser(data);
+            const res = await authAPI.login(formData);
+            const data = res.data.data;
+            setUser(data.user); // Store only user details in state
             localStorage.setItem('userInfo', JSON.stringify(data));
             return true;
         } catch (error) {
@@ -65,12 +69,26 @@ export const AppProvider = ({ children }) => {
 
     const register = async (formData) => {
         try {
-            const { data } = await authAPI.register(formData);
-            setUser(data);
+            const res = await authAPI.register(formData);
+            const data = res.data.data;
+            setUser(data.user); // Store only user details in state
             localStorage.setItem('userInfo', JSON.stringify(data));
             return true;
         } catch (error) {
             alert(error.response?.data?.message || "Đăng ký thất bại");
+            return false;
+        }
+    };
+
+    const googleLogin = async (token) => {
+        try {
+            const res = await authAPI.googleLogin({ token });
+            const data = res.data.data;
+            setUser(data.user); // Store only user details in state
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            return true;
+        } catch (error) {
+            alert(error.response?.data?.message || "Đăng nhập Google thất bại");
             return false;
         }
     };
@@ -117,6 +135,7 @@ export const AppProvider = ({ children }) => {
         fetchCars,
         login,
         register,
+        googleLogin,
         logout,
         addBooking,
         cancelBooking

@@ -67,7 +67,7 @@ const Checkout = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-secondary">Họ tên *</label>
-                                        <Input defaultValue={user?.full_name} className="bg-gray-50 h-11" />
+                                        <Input defaultValue={user?.name} className="bg-gray-50 h-11" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-secondary">Email *</label>

@@ -5,12 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { Chrome, Mail, Lock, User } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
+import { handleGoogleLogin } from "@/components/GoogleLogin";
 
 const Register = () => {
-    const { register } = useApp();
+    const { register, googleLogin } = useApp();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        full_name: "",
+        name: "",
         email: "",
         password: ""
     });
@@ -35,7 +36,11 @@ const Register = () => {
             <div className="w-full max-w-[480px]">
                 <Card className="border-none shadow-sm rounded-2xl">
                     <CardContent className="p-10 space-y-8">
-                        <Button variant="outline" className="w-full h-12 gap-3 font-semibold bg-gray-50 border-gray-300 hover:bg-gray-100 transition-colors rounded-xl">
+                        <Button
+                            onClick={() => handleGoogleLogin(googleLogin, navigate)}
+                            variant="outline"
+                            className="w-full h-12 gap-3 font-semibold bg-gray-50 border-gray-300 hover:bg-gray-100 transition-colors rounded-xl"
+                        >
                             <Chrome className="h-5 w-5" /> Đăng ký với Google
                         </Button>
 
@@ -55,10 +60,10 @@ const Register = () => {
                                     <div className="relative">
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                         <Input
-                                            name="full_name"
+                                            name="name"
                                             placeholder="Nguyễn Văn A"
                                             className="h-14 bg-gray-50 border-gray-300 pl-12 text-base rounded-xl focus-visible:ring-primary"
-                                            value={formData.full_name}
+                                            value={formData.name}
                                             onChange={handleChange}
                                             required
                                         />
