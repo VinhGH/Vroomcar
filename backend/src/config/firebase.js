@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 // Lấy path tuyệt đối tới file service account
-const serviceAccountPath = path.join(import.meta.dirname, "../../vroomcar-c2339-firebase-adminsdk-fbsvc-472ff98944.json");
+//const serviceAccountPath = path.join(import.meta.dirname, "../../vroomcar-c2339-firebase-adminsdk-fbsvc-472ff98944.json");
 
 // Đọc + parse file JSON chứa private key
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
