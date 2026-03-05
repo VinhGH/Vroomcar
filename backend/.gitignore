@@ -1,4 +1,4 @@
 node_modules
 .env
-*.json
+# Chỉ chặn đúng file bí mật, không chặn tất cả file json
 vroomcar-c2339-firebase-adminsdk-fbsvc-472ff98944.json
