@@ -20,7 +20,26 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
-app.use(cors());
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://vroomcar.vercel.app',
+    'https://vroomcar-frontend.vercel.app'
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Cho phép request không có origin (như Postman, server-to-server)
+        if (!origin) return callback(null, true);
+        // Cho phép các origin trong danh sách
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true // Cho phép gửi cookies
+}));
 app.use(express.json());
 app.use(cookieParser());
 
