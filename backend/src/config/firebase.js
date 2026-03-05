@@ -1,12 +1,7 @@
 import admin from "firebase-admin";
-import fs from "fs";
-import path from "path";
 
-// Lấy path tuyệt đối tới file service account
-//const serviceAccountPath = path.join(import.meta.dirname, "../../vroomcar-c2339-firebase-adminsdk-fbsvc-472ff98944.json");
-
-// Đọc + parse file JSON chứa private key
-const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+// Đọc service account từ environment variable (an toàn cho production/Render)
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 // Khởi tạo Firebase Admin bằng service account
 admin.initializeApp({
