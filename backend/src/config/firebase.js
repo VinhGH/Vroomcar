@@ -1,13 +1,13 @@
 import admin from "firebase-admin";
 
-// Đọc service account từ environment variable (an toàn cho production/Render)
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-// Fix: Render lưu \n trong env var thành \\n, cần convert lại thành newline thật để parse PEM key
-serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-
-// Khởi tạo Firebase Admin bằng service account
+// Dùng env var riêng biệt để tránh vấn đề JSON escaping của private_key trên Render
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        // replace \\n -> \n vì Render lưu newline trong env var thành literal \n
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
 });
 
 export default admin;
