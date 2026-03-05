@@ -28,28 +28,11 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        // Cho phép request không có origin (Postman, server-to-server)
-        if (!origin) return callback(null, true);
-        // Cho phép localhost và mọi subdomain *.vercel.app của project
-        const isAllowed =
-            allowedOrigins.includes(origin) ||
-            /^https:\/\/vroomcar.*\.vercel\.app$/.test(origin) ||
-            /^http:\/\/localhost:\d+$/.test(origin);
-
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            callback(null, false); // Trả false thay vì throw để tránh 500 error
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: allowedOrigins,
+    credentials: true
 }));
 
-// Xử lý preflight OPTIONS request cho tất cả routes
-app.options('*', cors());
+
 app.use(express.json());
 app.use(cookieParser());
 
