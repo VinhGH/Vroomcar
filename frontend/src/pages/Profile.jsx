@@ -171,7 +171,7 @@ const Profile = () => {
                 </Card>
 
                 {/* Đổi mật khẩu — Ẩn với tài khoản Google */}
-                {user?.authType !== 'google' && (
+                {/* {user?.authType !== 'google' && (
                     <Card className="border-none shadow-sm overflow-hidden">
                         <CardContent className="p-10">
                             <div className="flex items-center gap-3 mb-8">
@@ -233,7 +233,7 @@ const Profile = () => {
                             </div>
                         </CardContent>
                     </Card>
-                )}
+                )} */}
             </div>
         </div>
     );
