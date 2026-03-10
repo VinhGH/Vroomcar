@@ -14,8 +14,8 @@ export default defineConfig({
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
             manifest: {
                 name: 'Vroomcars',
-                short_name: 'AppShortName',
-                description: 'Mô tả ngắn về ứng dụng React PWA',
+                short_name: 'Vroomcars',
+                description: 'Vroomcars - Thuê xe tự lái toàn quốc',
                 theme_color: '#ffffff',
                 icons: [
                     {
